@@ -25,5 +25,4 @@ backend/.gradle/
 backend/logs/
 
 # Secrets (if you add them later)
-*.properties
 *.secret
