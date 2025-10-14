@@ -11,6 +11,6 @@ spring.jpa.properties.hibernate-dialect=org.hibernate.dialect.PostgreSQLDialect
 
 jwt.secret.key=wA8f+aV7q9ZkL8nJ2bA6dC9gH3eR1tY5uI7oP0xS4vC3mN2kL8jJ6bA5dC9gH3eR1tY5uI7oP0xS4vC3mN2k=
 
-plaid.client.id=68dc50fc37fe0500269e7949
-plaid.secret.sandbox=b6e0e95bdf7bac4a15ce43282be2c2
+plaid.client.id=
+plaid.secret.sandbox=
 plaid.env=sandbox

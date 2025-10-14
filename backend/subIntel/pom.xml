@@ -87,7 +87,13 @@
 		    <version>0.11.5</version>
 		    <scope>runtime</scope>
 		</dependency>
-	</dependencies>
+		
+		<dependency>
+		    <groupId>com.plaid</groupId>
+		    <artifactId>plaid-java</artifactId>
+		    <version>38.0.0</version>
+		</dependency>
+		</dependencies>
 
 	<build>
 		<plugins>

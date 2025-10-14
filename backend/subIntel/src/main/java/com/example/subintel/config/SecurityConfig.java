@@ -10,12 +10,23 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.example.subintel.service.AppUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	private final JwtAuthenticationFilter jwtAuthFilter;
+    //private final AppUserDetailsService userDetailsService;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, AppUserDetailsService userDetailsService) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    //    this.userDetailsService = userDetailsService;
+    }
+	
 	@Bean
 	public PasswordEncoder myPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -38,7 +49,7 @@ public class SecurityConfig {
 		return httpSecurity.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
 						authz -> authz.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
-
+	            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
 	

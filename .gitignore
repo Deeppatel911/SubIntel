@@ -26,3 +26,6 @@ backend/logs/
 
 # Secrets (if you add them later)
 *.secret
+
+# Ignore the file with real secrets
+backend/src/main/resources/application.properties

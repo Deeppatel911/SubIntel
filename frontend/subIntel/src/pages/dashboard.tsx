@@ -1,7 +1,10 @@
-import React from 'react';
+import LinkAccount from '../components/LinkAccount';
 
 export const Dashboard=() =>{
   return (
-    <div>dashboard</div>
+    <div>
+      <h1>dashboard</h1>
+      <LinkAccount />
+    </div>
   );
 }
