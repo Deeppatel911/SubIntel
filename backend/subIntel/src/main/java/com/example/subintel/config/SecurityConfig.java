@@ -20,13 +20,13 @@ import com.example.subintel.service.AppUserDetailsService;
 @EnableWebSecurity
 public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthFilter;
-    //private final AppUserDetailsService userDetailsService;
+	// private final AppUserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, AppUserDetailsService userDetailsService) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    //    this.userDetailsService = userDetailsService;
-    }
-	
+	public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, AppUserDetailsService userDetailsService) {
+		this.jwtAuthFilter = jwtAuthFilter;
+		// this.userDetailsService = userDetailsService;
+	}
+
 	@Bean
 	public PasswordEncoder myPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -38,7 +38,7 @@ public class SecurityConfig {
 			@Override
 			public void addCorsMappings(CorsRegistry corsRegistry) {
 				corsRegistry.addMapping("/api/**").allowedOrigins("http://localhost:5173")
-						.allowedMethods("Get", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*")
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*")
 						.allowCredentials(true);
 			}
 		};
@@ -47,14 +47,14 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(
-						authz -> authz.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
-	            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-				.build();
+				.authorizeHttpRequests(authz -> authz.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/**").hasRole("USER").anyRequest().authenticated())
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
-	
+
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 }

@@ -1,0 +1,23 @@
+package com.example.subintel.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.example.subintel.model.TransactionModel;
+
+@Repository
+public interface TransactionRepository extends JpaRepository<TransactionModel, Long>{
+	@Query("SELECT t FROM TransactionModel t WHERE t.accountModel.plaidItemModel.userModel.id = :userId ORDER BY t.localDate DESC")
+	List<TransactionModel> findTransactionsByUserId(Long userId);
+	
+	Optional<TransactionModel> findByTransactionId(String transactionId);
+	
+	boolean existsByTransactionId(String transactionId);
+
+	@Query("SELECT t FROM TransactionModel t WHERE t.accountModel.plaidItemModel.userModel.id = :userId ORDER BY t.localDate ASC")
+	List<TransactionModel> findTransactionsByUserIdOrderByLocalDateAsc(Long userId);
+}

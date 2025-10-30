@@ -1,20 +1,25 @@
 package com.example.subintel.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.OneToMany;
+//import lombok.Data;
 
-@Data
+//@Data
 @Entity
 public class UserModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long user_id;
+	private long id;
 	@Column(nullable = false)
 	private String firstName;
 	@Column(nullable = false)
@@ -25,13 +30,17 @@ public class UserModel {
 	private String password;
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
+	
     private Role role = Role.USER;
+	
+	@OneToMany(mappedBy = "userModel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<PlaidItemModel> plaidItems;
 
-	public long getUser_id() {
-		return user_id;
+	public long getId() {
+		return id;
 	}
-	public void setUser_id(long user_id) {
-		this.user_id = user_id;
+	public void setId(long id) {
+		this.id = id;
 	}
 	public String getFirstName() {
 		return firstName;
@@ -59,12 +68,18 @@ public class UserModel {
 	}
 	@Override
 	public String toString() {
-		return "UserModel [user_id=" + user_id + "]";
+		return "UserModel [user_id=" + id + "]";
 	}
 	public Role getRole() {
 		return role;
 	}
 	public void setRole(Role role) {
 		this.role = role;
+	}
+	public List<PlaidItemModel> getPlaidItems() {
+		return plaidItems;
+	}
+	public void setPlaidItems(List<PlaidItemModel> plaidItems) {
+		this.plaidItems = plaidItems;
 	}
 }

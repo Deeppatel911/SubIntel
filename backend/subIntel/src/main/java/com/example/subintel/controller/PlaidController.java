@@ -28,4 +28,9 @@ public class PlaidController {
 	public ResponseEntity<?> exchangePublicToken(@RequestBody ExchangePublicToken publicTokenRequest){
 		return plaidService.exchangePublicToken(publicTokenRequest);
 	}
+	
+	@PostMapping("/transactions")
+	public ResponseEntity<?> syncTransactions(){
+		return plaidService.fetchAndSaveTransactions();
+	}
 }

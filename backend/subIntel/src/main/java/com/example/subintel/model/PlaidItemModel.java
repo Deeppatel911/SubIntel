@@ -8,15 +8,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
+//import lombok.Data;
 
-@Data
+//@Data
 @Entity
 public class PlaidItemModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long plaidItemId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
@@ -28,12 +28,12 @@ public class PlaidItemModel {
 	@Column(nullable = false, unique = true)
 	private String itemId;
 
-	public Long getPlaidItemId() {
-		return plaidItemId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setPlaidItemId(Long plaidItemId) {
-		this.plaidItemId = plaidItemId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public UserModel getUserModel() {
