@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Frequency } from "../model/Frequency";
+import {
+  Box,
+  Typography,
+  Button,
+  MenuItem,
+  FormControl,
+  FormHelperText,
+} from "@mui/material";
+
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import type { SelectChangeEvent } from "@mui/material/Select";
 
 interface Subscription {
   subscriptionId: number;
@@ -31,7 +44,6 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
   existingSubscription,
 }) => {
   const isEditMode = !!existingSubscription;
-
   const [formData, setFormData] = useState<FormData>({
     merchantName: "",
     estimatedAmount: "",
@@ -51,13 +63,25 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
         lastPaymentDate: existingSubscription.lastPaymentDate || "",
         nextDueDate: existingSubscription.nextDueDate || "",
       });
+    } else {
+      setFormData({
+        merchantName: "",
+        estimatedAmount: "",
+        frequency: "",
+        lastPaymentDate: "",
+        nextDueDate: "",
+      });
     }
   }, [isEditMode, existingSubscription]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const name = (e.target as HTMLInputElement).name;
+    const value = e.target.value;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,7 +98,6 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
       setIsSubmitting(false);
       return;
     }
-
     const amount = parseFloat(formData.estimatedAmount);
     if (isNaN(amount)) {
       setError("Estimated Amount must be a valid number.");
@@ -95,7 +118,6 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
       const url = isEditMode
         ? `http://localhost:8080/api/subscriptions/${existingSubscription?.subscriptionId}`
         : "http://localhost:8080/api/subscriptions";
-
       const method = isEditMode ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -106,6 +128,7 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
         },
         body: JSON.stringify(payload),
       });
+
       if (response.ok) {
         onSuccess();
       } else {
@@ -128,119 +151,91 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
     }
   };
 
-  const formStyle: React.CSSProperties = {
-    border: "1px solid grey",
-    padding: "15px",
-    margin: "15px 0",
-    borderRadius: "5px",
-    backgroundColor: "#f9f9f9", // Light background
-  };
-  const inputStyle: React.CSSProperties = {
-    margin: "5px",
-    padding: "8px",
-    width: "95%",
-  };
-  const buttonStyle: React.CSSProperties = {
-    margin: "5px",
-    padding: "10px 15px",
-  };
-  const errorStyle: React.CSSProperties = { color: "red", marginTop: "10px" };
-
-  const labelStyle: React.CSSProperties = {
-    color: 'black', // Or any dark color
-    display: 'block',
-    marginBottom: '2px'
-  };
-
   return (
-    <div style={formStyle}>
-      <h3 style={{'color':'black'}}>{isEditMode ? "Edit Subscription" : "Add New Subscription"}</h3>
+    <Box>
+      <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+        {isEditMode ? "Edit Subscription" : "Add New Subscription"}
+      </Typography>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label style={labelStyle}>Merchant Name*:</label>
-          <input
-            type="text"
-            name="merchantName"
-            value={formData.merchantName}
-            onChange={handleChange}
-            style={inputStyle}
-            required
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Estimated Amount*:</label>
-          <input
-            type="number"
-            step="0.01"
-            name="estimatedAmount"
-            value={formData.estimatedAmount}
-            onChange={handleChange}
-            style={inputStyle}
-            required
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Frequency*:</label>
-          <select
+        <TextField
+          label="Merchant Name"
+          name="merchantName"
+          value={formData.merchantName}
+          onChange={handleChange}
+          required
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Estimated Amount"
+          name="estimatedAmount"
+          type="number"
+          value={formData.estimatedAmount}
+          onChange={handleChange}
+          required
+          fullWidth
+          margin="normal"
+        />
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel id="frequency-label">Frequency</InputLabel>
+          <Select
+            labelId="frequency-label"
             name="frequency"
             value={formData.frequency}
+            label="Frequency"
             onChange={handleChange}
-            style={inputStyle}
-            required
           >
-            <option value="" disabled>
+            <MenuItem value="" disabled>
               Select Frequency
-            </option>
-
+            </MenuItem>
             {Object.values(Frequency).map((freq) => (
-              <option key={freq} value={freq}>
+              <MenuItem key={freq} value={freq}>
                 {freq}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
-        <div>
-          <label style={labelStyle}>Last Payment Date (Optional):</label>
-          <input
-            type="date"
-            name="lastPaymentDate"
-            value={formData.lastPaymentDate}
-            onChange={handleChange}
-            style={inputStyle}
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Next Due Date (Optional):</label>
-          <input
-            type="date"
-            name="nextDueDate"
-            value={formData.nextDueDate}
-            onChange={handleChange}
-            style={inputStyle}
-          />
-        </div>
+          </Select>
+        </FormControl>
+        <TextField
+          label="Last Payment Date (Optional)"
+          name="lastPaymentDate"
+          type="date"
+          value={formData.lastPaymentDate}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          slotProps={{
+            inputLabel: { shrink: true },
+          }}
+        />
+        <TextField
+          label="Next Due Date (Optional)"
+          name="nextDueDate"
+          type="date"
+          value={formData.nextDueDate}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          slotProps={{
+            inputLabel: { shrink: true },
+          }}
+        />
 
-        {error && <p style={errorStyle}>{error}</p>}
+        {error && (
+          <FormHelperText error sx={{ mt: 2 }}>
+            {error}
+          </FormHelperText>
+        )}
 
-        <div>
-          <button type="submit" disabled={isSubmitting} style={buttonStyle}>
-            {isSubmitting
-              ? "Saving..."
-              : isEditMode
-              ? "Update Subscription"
-              : "Save Subscription"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            style={buttonStyle}
-          >
+        <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
+          <Button onClick={onClose} disabled={isSubmitting} sx={{ mr: 1 }}>
             Cancel
-          </button>
-        </div>
+          </Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Save"}
+          </Button>
+        </Box>
       </form>
-    </div>
+    </Box>
   );
 };
 

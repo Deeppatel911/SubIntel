@@ -1,54 +1,147 @@
-import React, {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Alert,
+} from "@mui/material";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName:'',
-    email: '',
-    password: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
   });
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        navigate('/login');
-      }
-      else{
+        navigate("/login");
+      } else {
         const errorData = await response.text();
-        console.error('Registration failed:', errorData);
+        setError(errorData || "Registration failed.");
+        console.error("Registration failed:", errorData);
       }
-  }
-  catch (error) {
-      console.error('Error during registration:', error);
+    } catch (error) {
+      setError("An error occurred during registration.");
+      console.error("Error during registration:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-};
+  };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-            {/* Input fields for firstName, lastName, email, password */}
-            {/* Each input should have a name, value, and onChange handler */}
-            <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" />
-            <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" />
-            <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" />
-            <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" />
-            <button type="submit">Register</button>
-        </form>
-    </div>
-  )
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          Register
+        </Typography>
+        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Grid container spacing={2}>
+            {/* <Grid item xs={12} sm={6}> */}
+            <TextField
+              autoComplete="given-name"
+              name="firstName"
+              required
+              fullWidth
+              id="firstName"
+              label="First Name"
+              autoFocus
+              value={formData.firstName}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+            {/* </Grid> */}
+            {/* <Grid item xs={12} sm={6}> */}
+            <TextField
+              required
+              fullWidth
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              autoComplete="family-name"
+              value={formData.lastName}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+            {/* </Grid> */}
+            {/* <Grid item xs={12}> */}
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+            {/* </Grid> */}
+            {/* <Grid item xs={12}> */}
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isSubmitting}
+            />
+            {/* </Grid> */}
+          </Grid>
+
+          {error && (
+            <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
+              {error}
+            </Alert>
+          )}
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Registering..." : "Register"}
+          </Button>
+        </Box>
+      </Box>
+    </Container>
+  );
 };

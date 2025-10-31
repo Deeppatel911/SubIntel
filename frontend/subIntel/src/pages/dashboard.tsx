@@ -1,7 +1,34 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LinkAccount from "../components/LinkAccount";
 import SubscriptionPieChart from "../components/SubscriptionPieChart";
 import SubscriptionForm from "../components/SubscriptionForm";
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Divider,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Modal,
+  Card,
+  CardContent,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Grid from "@mui/material/Grid";
 
 interface Transaction {
   id: number;
@@ -29,19 +56,29 @@ interface Account {
   officialName: string | null;
 }
 
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+};
+
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isSubLoading, setIsSubLoading] = useState(false);
-
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
   const [isAccountsLoading, setIsAccountsLoading] = useState(false);
 
-  const [showAddForm, setShowAddForm] = useState(false);
-
+  const [showFormModal, setShowFormModal] = useState(false);
   const [editingSubscription, setEditingSubscription] =
     useState<Subscription | null>(null);
 
@@ -52,13 +89,8 @@ export const Dashboard = () => {
       const response = await fetch("http://localhost:8080/api/accounts", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
-      if (response.ok) {
-        const data = await response.json();
-        setAccounts(data);
-      } else {
-        console.error("Failed to fetch accounts");
-        setAccounts([]);
-      }
+      if (response.ok) setAccounts(await response.json());
+      else setAccounts([]);
     } catch (error) {
       console.error("Error fetching accounts:", error);
     } finally {
@@ -73,8 +105,8 @@ export const Dashboard = () => {
       const response = await fetch("http://localhost:8080/api/subscriptions", {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
-      const data = await response.json();
-      setSubscriptions(data);
+      if (response.ok) setSubscriptions(await response.json());
+      else setSubscriptions([]);
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
     } finally {
@@ -92,37 +124,21 @@ export const Dashboard = () => {
     setTransactions([]);
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-
-      const syncResponse = await fetch(
-        "http://localhost:8080/api/plaid/transactions",
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${jwtToken}` },
-        }
-      );
-
-      if (!syncResponse.ok) {
-        throw new Error("Failed to trigger transaction sync");
-      }
-
+      await fetch("http://localhost:8080/api/plaid/transactions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+      await fetch("http://localhost:8080/api/subscriptions/detect", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
       const transResponse = await fetch(
         "http://localhost:8080/api/transactions",
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
         }
       );
-      if (transResponse.ok) {
-        const data = await transResponse.json();
-        setTransactions(data);
-      } else {
-        console.error("Failed to fetch transactions after sync");
-      }
-
-      await fetch("http://localhost:8080/api/subscriptions/detect", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${jwtToken}` },
-      });
-
+      if (transResponse.ok) setTransactions(await transResponse.json());
       await fetchAccounts();
       await fetchSubscriptions();
     } catch (error) {
@@ -132,184 +148,274 @@ export const Dashboard = () => {
     }
   };
 
-  const handleAccountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const accountId = e.target.value;
-    setSelectedAccountId(accountId);
+  const handleAccountChange = (
+    event: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    setSelectedAccountId(event.target.value as string);
   };
 
-  const handleSubscriptionAdded = () => {
-    setShowAddForm(false);
+  const handleDeleteSubscription = async (subscriptionId: number) => {
+    if (!window.confirm("Are you sure you want to delete this subscription?"))
+      return;
+    try {
+      const jwtToken = localStorage.getItem("jwtToken");
+      const response = await fetch(
+        `http://localhost:8080/api/subscriptions/${subscriptionId}`,
+        { method: "DELETE", headers: { Authorization: `Bearer ${jwtToken}` } }
+      );
+      if (response.ok) fetchSubscriptions();
+      else alert("Failed to delete subscription.");
+    } catch (error) {
+      alert("An error occurred while deleting.");
+      console.error("Error deleting subscription:", error);
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setShowFormModal(false);
+    setEditingSubscription(null);
     fetchSubscriptions();
+  };
+
+  const handleFormClose = () => {
+    setShowFormModal(false);
+    setEditingSubscription(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    navigate("/login");
   };
 
   const filteredTransactions = transactions.filter(
     (t) => selectedAccountId === "all" || t.accountId === selectedAccountId
   );
 
-  const handleDeleteSubscription = async (subscriptionId: number) => {
-    if (!window.confirm("Are you sure you want to delete this subscription?")) {
-      return;
-    }
-
-    try {
-      const jwtToken = localStorage.getItem("jwtToken");
-      const response = await fetch(
-        `http://localhost:8080/api/subscriptions/${subscriptionId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${jwtToken}` },
-        }
-      );
-      if (response.ok) {
-        fetchSubscriptions();
-      } else {
-        const errorData = await response.text();
-        console.error("Failed to delete subscription:", errorData);
-        alert(`Failed to delete: ${errorData}`);
-      }
-    } catch (error) {
-      console.error("Error deleting subscription:", error);
-      alert("An error occurred while deleting the subscription.");
-    }
-  };
-
-  const handleSubscriptionUpdated = () => {
-    setEditingSubscription(null);
-    fetchSubscriptions();
-  };
-
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <LinkAccount />
-      <hr />
-      <button
-        onClick={handleSyncTransactions}
-        disabled={isLoading || isSubLoading}
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      {/* --- Header & Logout --- */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
       >
-        {isLoading ? "Syncing..." : "Sync Transactions"}
-      </button>
+        <Typography component="h1" variant="h4">
+          Dashboard
+        </Typography>
+        <Button variant="outlined" color="secondary" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Box>
 
-      <div>
-        <label htmlFor="accountSelect">Filter by Account: </label>
-        <select
-          id="account-filter"
-          value={selectedAccountId}
-          onChange={handleAccountChange}
-          disabled={isAccountsLoading}
-        >
-          <option value="all">All Accounts</option>
-          {accounts.map((acc) => (
-            <option key={acc.accountId} value={acc.accountId}>
-              {acc.name} ({acc.officialName})
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* --- Top Control Bar --- */}
+      <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
+        <Grid item>
+          <LinkAccount />
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={handleSyncTransactions}
+            disabled={isLoading}
+          >
+            {isLoading ? "Syncing..." : "Sync Transactions"}
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth>
+            <InputLabel id="account-filter-label">Filter by Account</InputLabel>
+            <Select
+              labelId="account-filter-label"
+              value={selectedAccountId}
+              label="Filter by Account"
+              onChange={handleAccountChange}
+              disabled={isAccountsLoading}
+            >
+              <MenuItem value="all">All Accounts</MenuItem>
+              {accounts.map((acc) => (
+                <MenuItem key={acc.accountId} value={acc.accountId}>
+                  {acc.name} ({acc.officialName})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Divider sx={{ mb: 3 }} />
 
-      <button onClick={() => setShowAddForm(true)}>
-        + Add New Subscription
-      </button>
-      {showAddForm && (
-        <SubscriptionForm
-          onClose={() => setShowAddForm(false)}
-          onSuccess={handleSubscriptionAdded}
-        />
-      )}
+      {/* --- Main Content Grid --- */}
+      <Grid container spacing={3}>
+        {/* --- Spending Chart --- */}
+        <Grid item xs={12} md={5}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Spending Distribution
+              </Typography>
+              <SubscriptionPieChart key={subscriptions.length} />
+            </CardContent>
+          </Card>
+        </Grid>
 
-      {editingSubscription && (
-        <SubscriptionForm
-          onClose={() => setEditingSubscription(null)}
-          onSuccess={handleSubscriptionUpdated}
-          existingSubscription={editingSubscription}
-        />
-      )}
-
-      <h2>Spending Distribution</h2>
-      <SubscriptionPieChart key={subscriptions.length} />
-      <hr />
-
-      <h2>Subscriptions</h2>
-      {isSubLoading ? (
-        <p>Loading subscriptions...</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Merchant</th>
-              <th>Est. Amount</th>
-              <th>Frequency</th>
-              <th>Last Payment</th>
-              <th>Next Due</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subscriptions.length === 0 && (
-              <tr>
-                <td colSpan={5}>No subscriptions detected.</td>
-              </tr>
-            )}
-            {subscriptions.map((sub) => (
-              <tr
-                key={sub.subscriptionId}
-                style={{ opacity: sub.isActive ? 1 : 0.5 }}
+        {/* --- Subscriptions --- */}
+        <Grid item xs={12} md={7}>
+          <Card>
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
               >
-                <td>{sub.merchantName}</td>
-                <td>${Math.abs(sub.estimatedAmount).toFixed(2)}</td>
-                <td>{sub.frequency}</td>
-                <td>{sub.lastPaymentDate}</td>
-                <td>{sub.nextDueDate}</td>
-                <td>
-                  <button onClick={() => setEditingSubscription(sub)}>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSubscription(sub.subscriptionId)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <Typography variant="h6">Subscriptions</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setShowFormModal(true)}
+                >
+                  Add New
+                </Button>
+              </Box>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Merchant</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell>Frequency</TableCell>
+                      <TableCell>Last Payment</TableCell>
+                      <TableCell>Next Due</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {isSubLoading && (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isSubLoading && subscriptions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          No subscriptions detected.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isSubLoading &&
+                      subscriptions.map((sub) => (
+                        <TableRow
+                          key={sub.subscriptionId}
+                          sx={{ opacity: sub.isActive ? 1 : 0.5 }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {sub.merchantName}
+                          </TableCell>
+                          <TableCell align="right">
+                            ${Math.abs(sub.estimatedAmount).toFixed(2)}
+                          </TableCell>
+                          <TableCell>{sub.frequency}</TableCell>
+                          <TableCell>{sub.lastPaymentDate}</TableCell>
+                          <TableCell>{sub.nextDueDate}</TableCell>
+                          <TableCell align="center" sx={{ p: 0 }}>
+                            <IconButton
+                              onClick={() => setEditingSubscription(sub)}
+                              size="small"
+                              color="primary"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() =>
+                                handleDeleteSubscription(sub.subscriptionId)
+                              }
+                              size="small"
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
 
-      <h2>Transactions</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* {transactions */}
-          {filteredTransactions.length === 0 && (
-            <tr>
-              <td colSpan={5}>No transactions found for selected account.</td>
-            </tr>
-          )}
-          {filteredTransactions.map((t) => (
-            <tr key={t.id}>
-              <td>{t.date}</td>
-              <td>{t.name}</td>
-              <td>${t.amount.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        {/* --- Transactions --- */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Transactions
+              </Typography>
+              <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Account</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {isLoading && (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isLoading && filteredTransactions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          No transactions found for selected account.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isLoading &&
+                      filteredTransactions.map((t) => (
+                        <TableRow key={t.id}>
+                          <TableCell>{t.date}</TableCell>
+                          <TableCell>{t.name}</TableCell>
+                          <TableCell>{t.accountName}</TableCell>
+                          <TableCell>{t.category}</TableCell>
+                          <TableCell align="right">
+                            ${t.amount.toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* --- Add/Edit Modal (Consolidated) --- */}
+      <Modal
+        open={showFormModal || !!editingSubscription}
+        onClose={handleFormClose}
+      >
+        <Box sx={modalStyle}>
+          <SubscriptionForm
+            onClose={handleFormClose}
+            onSuccess={handleFormSuccess}
+            existingSubscription={editingSubscription}
+          />
+        </Box>
+      </Modal>
+    </Container>
   );
 };
-
-/* export const Dashboard=() =>{
-  return (
-    <div>
-      <h1>dashboard</h1>
-      <LinkAccount />
-    </div>
-  );
-} */
