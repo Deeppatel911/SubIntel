@@ -8,9 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-//import lombok.Data;
+import lombok.Data;
 
-//@Data
+@Data
 @Entity
 public class PlaidItemModel {
 
@@ -27,36 +27,4 @@ public class PlaidItemModel {
 
 	@Column(nullable = false, unique = true)
 	private String itemId;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public UserModel getUserModel() {
-		return userModel;
-	}
-
-	public void setUserModel(UserModel userModel) {
-		this.userModel = userModel;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public String getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
-	}
 }

@@ -41,7 +41,7 @@ public class SubscriptionService {
 	}
 
 	@Transactional
-	public void detectSubscriptionsForUser(Long userId) { // List<Map<String, Object>>
+	public void detectAndSaveSubscriptionsForUser(Long userId) { // List<Map<String, Object>>
 
 		logger.info("Starting subscription detection for user ID: {}", userId);
 		UserModel user = userRepository.findById(userId)

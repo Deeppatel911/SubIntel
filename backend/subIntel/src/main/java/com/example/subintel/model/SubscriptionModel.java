@@ -12,7 +12,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Data;
 
+@Data
 @Entity
 public class SubscriptionModel {
 	@Id
@@ -36,68 +38,4 @@ public class SubscriptionModel {
 	private LocalDate lastPaymentDate;
 	
 	private boolean isActive=true;
-
-	public Long getSubscriptionId() {
-		return subscriptionId;
-	}
-
-	public void setSubscriptionId(Long subscriptionId) {
-		this.subscriptionId = subscriptionId;
-	}
-
-	public UserModel getUserModel() {
-		return userModel;
-	}
-
-	public void setUserModel(UserModel userModel) {
-		this.userModel = userModel;
-	}
-
-	public String getMerchantName() {
-		return merchantName;
-	}
-
-	public void setMerchantName(String merchant) {
-		this.merchantName = merchant;
-	}
-
-	public Frequency getFrequency() {
-		return frequency;
-	}
-
-	public void setFrequency(Frequency frequency) {
-		this.frequency = frequency;
-	}
-
-	public double getEstimatedAmount() {
-		return estimatedAmount;
-	}
-
-	public void setEstimatedAmount(double estimatedAmount) {
-		this.estimatedAmount = estimatedAmount;
-	}
-
-	public LocalDate getNextDueDate() {
-		return nextDueDate;
-	}
-
-	public void setNextDueDate(LocalDate nextDueDate) {
-		this.nextDueDate = nextDueDate;
-	}
-
-	public LocalDate getLastPaymentDate() {
-		return lastPaymentDate;
-	}
-
-	public void setLastPaymentDate(LocalDate lastPaymentDate) {
-		this.lastPaymentDate = lastPaymentDate;
-	}
-
-	public boolean isActive() {
-		return isActive;
-	}
-
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
-	}
 }

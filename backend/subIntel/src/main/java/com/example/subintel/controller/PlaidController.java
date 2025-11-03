@@ -31,6 +31,6 @@ public class PlaidController {
 	
 	@PostMapping("/transactions")
 	public ResponseEntity<?> syncTransactions(){
-		return plaidService.fetchAndSaveTransactions();
+		return plaidService.fetchAndSaveTransactionsForCurrentUser();
 	}
 }

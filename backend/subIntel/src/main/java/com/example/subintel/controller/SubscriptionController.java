@@ -70,7 +70,7 @@ public class SubscriptionController {
 					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 			logger.info("Received GET request for subscriptions for user ID: {}", user.getId());
-			subscriptionService.detectSubscriptionsForUser(user.getId());
+			subscriptionService.detectAndSaveSubscriptionsForUser(user.getId());
 
 			return ResponseEntity.ok(Collections.singletonMap("message", "Subscription detection complete."));
 		} catch (UsernameNotFoundException e) {

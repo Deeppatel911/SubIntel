@@ -48,7 +48,6 @@ public class PlaidService {
 	private PlaidItemRepository plaidItemRepository;
 	private AccountRepository accountRepository;
 	private TransactionRepository transactionRepository;
-	private SubscriptionService subscriptionService;
 
 	public PlaidService(UserRepository userRepository, PlaidApi plaidApi, PlaidItemRepository plaidItemRepository,
 			AccountRepository accountRepository, TransactionRepository transactionRepository) {
@@ -139,18 +138,22 @@ public class PlaidService {
 	}
 
 	@Transactional
-	public ResponseEntity<?> fetchAndSaveTransactions() {
+	public void fetchAndSaveTransactions(UserModel user) throws IOException {
 		try {
-			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-			UserModel user = userRepository.findByEmail(userEmail)
-					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+			// String userEmail =
+			// SecurityContextHolder.getContext().getAuthentication().getName();
+			// UserModel user = userRepository.findByEmail(userEmail)
+			// .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 			List<PlaidItemModel> plaidItems = user.getPlaidItems();// .stream().findFirst()
 			// .orElseThrow(() -> new IllegalStateException("No linked account found for
 			// this user."));
 
 			if (plaidItems == null || plaidItems.isEmpty()) {
-				return ResponseEntity.badRequest().body("No linked accounts found for this user");
+				// return ResponseEntity.badRequest().body("No linked accounts found for this
+				// user");
+				logger.warn("No linked accounts found for user ID: {},. Skipping sync.", user.getId());
+				return;
 			}
 
 			for (PlaidItemModel plaidItem : plaidItems) {
@@ -161,7 +164,10 @@ public class PlaidService {
 					TransactionsSyncResponse response = plaidApi.transactionsSync(request).execute().body();
 
 					if (response == null) {
-						return ResponseEntity.internalServerError().body("Received an empty response from Plaid.");
+						// return ResponseEntity.internalServerError().body("Received an empty response
+						// from Plaid.");
+						logger.warn("Received an empty response from Plaid.");
+						return;
 					}
 
 					for (AccountBase acc : response.getAccounts()) {
@@ -214,11 +220,28 @@ public class PlaidService {
 							itemSyncException.getMessage(), itemSyncException);
 				}
 			}
-
-			return ResponseEntity.ok(Collections.singletonMap("message", "Transactions synced successfully!"));
+			// return ResponseEntity.ok(Collections.singletonMap("message", "Transactions
+			// synced successfully!"));
 
 		} catch (Exception e) {
 			logger.error("An unexpected error occurred during transaction sync.", e);
+			return;
+			// return ResponseEntity.internalServerError().body("An error occurred during
+			// transaction sync.");
+		}
+	}
+
+	public ResponseEntity<?> fetchAndSaveTransactionsForCurrentUser() {
+		try {
+			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+			UserModel user = userRepository.findByEmail(userEmail)
+					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+			fetchAndSaveTransactions(user);
+			return ResponseEntity.ok(Collections.singletonMap("message", "Transaction sync initiated for all items."));
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error("An unexpected error occurred during the user-triggered transaction sync.", e);
 			return ResponseEntity.internalServerError().body("An error occurred during transaction sync.");
 		}
 	}

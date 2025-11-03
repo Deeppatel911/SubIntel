@@ -9,13 +9,4 @@ public class CreateLinkTokenResponse {
     public CreateLinkTokenResponse(String link_token) {
         this.link_token = link_token;
     }
-
-	public String getLink_token() {
-		return link_token;
-	}
-
-	public void setLink_token(String link_token) {
-		this.link_token = link_token;
-	}
-    
 }
