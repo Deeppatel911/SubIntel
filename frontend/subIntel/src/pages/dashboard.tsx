@@ -81,6 +81,7 @@ export const Dashboard = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingSubscription, setEditingSubscription] =
     useState<Subscription | null>(null);
+  const [chartVersion, setChartVersion] = useState(0);
 
   const fetchAccounts = async () => {
     setIsAccountsLoading(true);
@@ -140,7 +141,9 @@ export const Dashboard = () => {
       );
       if (transResponse.ok) setTransactions(await transResponse.json());
       await fetchAccounts();
-      await fetchSubscriptions();
+      await fetchSubscriptions().then(() => {
+        setChartVersion((v) => v + 1);
+      });
     } catch (error) {
       console.error("Error during sync process:", error);
     } finally {
@@ -163,8 +166,11 @@ export const Dashboard = () => {
         `http://localhost:8080/api/subscriptions/${subscriptionId}`,
         { method: "DELETE", headers: { Authorization: `Bearer ${jwtToken}` } }
       );
-      if (response.ok) fetchSubscriptions();
-      else alert("Failed to delete subscription.");
+      if (response.ok) {
+        fetchSubscriptions().then(() => {
+          setChartVersion((v) => v + 1);
+        });
+      } else alert("Failed to delete subscription.");
     } catch (error) {
       alert("An error occurred while deleting.");
       console.error("Error deleting subscription:", error);
@@ -174,7 +180,9 @@ export const Dashboard = () => {
   const handleFormSuccess = () => {
     setShowFormModal(false);
     setEditingSubscription(null);
-    fetchSubscriptions();
+    fetchSubscriptions().then(() => {
+      setChartVersion((v) => v + 1);
+    });
   };
 
   const handleFormClose = () => {
@@ -255,7 +263,7 @@ export const Dashboard = () => {
               <Typography variant="h6" gutterBottom>
                 Spending Distribution
               </Typography>
-              <SubscriptionPieChart key={subscriptions.length} />
+              <SubscriptionPieChart key={chartVersion} />
             </CardContent>
           </Card>
         </Grid>

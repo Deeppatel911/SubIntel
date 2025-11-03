@@ -90,6 +90,7 @@ public class SubscriptionService {
 		});
 
 		logger.info("Finished subscription detection for user ID: {}", userId);
+		deactivateLapsedSubscriptions(userId, transactions);
 	}
 
 	private Optional<DetectedPattern> findRecurringPattern(List<TransactionModel> transactions) {
@@ -199,6 +200,31 @@ public class SubscriptionService {
 			this.frequency = frequency;
 			this.averageAmount = averageAmount;
 			this.latestTransaction = latestTransaction;
+		}
+	}
+
+	public void deactivateLapsedSubscriptions(Long userId, List<TransactionModel> allTransactions) {
+		logger.info("Checking for lapsed subscriptions for user ID: {}", userId);
+
+		List<SubscriptionModel> activSubscriptions = subscriptionRepository.findByUserModel_IdAndIsActiveTrue(userId);
+
+		for (SubscriptionModel sub : activSubscriptions) {
+			boolean isOverDue = sub.getNextDueDate() != null
+					&& sub.getNextDueDate().isBefore(LocalDate.now().minusDays(7));
+
+			if (isOverDue) {
+				boolean paymentFound = allTransactions.stream()
+						.filter(t -> t.getName() != null && t.getName().equals(sub.getMerchantName()))
+						.filter(t -> t.getAmount() < 0)
+						.anyMatch(t -> t.getLocalDate().isAfter(sub.getLastPaymentDate()));
+
+				if (!paymentFound) {
+					logger.info("Deactivating lapsed subscription: '{}' (ID: {}) for user ID: {}",
+							sub.getMerchantName(), sub.getSubscriptionId(), userId);
+					sub.setActive(false);
+					subscriptionRepository.save(sub);
+				}
+			}
 		}
 	}
 
