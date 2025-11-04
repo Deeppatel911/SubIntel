@@ -1,5 +1,7 @@
 package com.example.subintel.model;
 
+import java.security.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -29,10 +31,15 @@ public class UserModel {
 	@Column(nullable = false)
 	private String password;
 	@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-	
-    private Role role = Role.USER;
-	
+	@Column(nullable = false)
+
+	private Role role = Role.USER;
+
+	private String resetPasswordToken;
+
+	@Column(columnDefinition = "TIMESTAMP")
+	private LocalDateTime resetPasswordTokenExpiry;
+
 	@OneToMany(mappedBy = "userModel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<PlaidItemModel> plaidItems;
 }

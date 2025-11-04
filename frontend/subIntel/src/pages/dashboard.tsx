@@ -54,6 +54,7 @@ interface Account {
   accountId: string;
   name: string;
   officialName: string | null;
+  itemId: string;
 }
 
 const modalStyle = {
@@ -199,6 +200,48 @@ export const Dashboard = () => {
     (t) => selectedAccountId === "all" || t.accountId === selectedAccountId
   );
 
+  const handleUnlinkAccount = async (itemId: string, accountName: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to unlink "${accountName}"? This will delete all associated accounts and transactions.`
+      )
+    )
+      return;
+
+    try {
+      const jwtToken = localStorage.getItem("jwtToken");
+      const response = await fetch(
+        `http://localhost:8080/api/plaid/item/${itemId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        }
+      );
+
+      if (response.ok) {
+        setSelectedAccountId("all");
+        await fetchAccounts();
+        await fetchSubscriptions();
+
+        const transResponse = await fetch(
+          "http://localhost:8080/api/transactions",
+          {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          }
+        );
+        if (transResponse.ok) setTransactions(await transResponse.json());
+        else setTransactions([]);
+      } else {
+        const errorData = await response.text();
+        console.error("Failed to unlink account:", errorData);
+        alert(`Failed to unlink: ${errorData}`);
+      }
+    } catch (error) {
+      console.error("Error unlinking account:", error);
+      alert("An error occurred while unlinking the account.");
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       {/* --- Header & Logout --- */}
@@ -241,11 +284,36 @@ export const Dashboard = () => {
               label="Filter by Account"
               onChange={handleAccountChange}
               disabled={isAccountsLoading}
+              renderValue={(selected) => {
+                if (selected === "all") return "All Accounts";
+                const account = accounts.find((a) => a.accountId === selected);
+                return account
+                  ? `${account.name} (${account.officialName})`
+                  : "";
+              }}
             >
               <MenuItem value="all">All Accounts</MenuItem>
               {accounts.map((acc) => (
-                <MenuItem key={acc.accountId} value={acc.accountId}>
-                  {acc.name} ({acc.officialName})
+                <MenuItem
+                  key={acc.accountId}
+                  value={acc.accountId}
+                  sx={{ justifyContent: "space-between" }}
+                >
+                  <span>
+                    {acc.name} ({acc.officialName})
+                  </span>
+                  <Button
+                    size="small"
+                    color="error"
+                    variant="outlined"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUnlinkAccount(acc.itemId, acc.name);
+                    }}
+                    sx={{ ml: 2 }}
+                  >
+                    Unlink
+                  </Button>
                 </MenuItem>
               ))}
             </Select>

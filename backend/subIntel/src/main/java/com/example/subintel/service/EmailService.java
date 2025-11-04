@@ -45,4 +45,16 @@ public class EmailService {
 
 		sendSimpleMessage(to, subject, text);
 	}
+
+	public void sendPasswordResetEmail(UserModel user, String token) {
+		String to = user.getEmail();
+		String subject = "Your Password Reset Request for SubIntel";
+		String resetUrl = "http://localhost:5173/reset-password?token=" + token;
+		String text = String.format("Hi %s,\n\n"
+				+ "You requested to reset your password. Click the link below to set a new one:\n\n" + "%s\n\n"
+				+ "If you did not request this, please ignore this email.\n\n" + "Thanks,\nThe SubIntel Team",
+				user.getFirstName(), resetUrl);
+
+		sendSimpleMessage(to, subject, text);
+	}
 }

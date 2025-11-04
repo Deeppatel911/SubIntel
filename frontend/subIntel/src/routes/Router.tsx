@@ -4,6 +4,8 @@ import { Login } from "../pages/login";
 import { Dashboard } from "../pages/dashboard";
 import ProtectedRoutes from "./ProtectedRoutes";
 import GuestRoutes from "./GuestRoutes";
+import { ForgotPassword } from "../pages/ForgotPassword";
+import { ResetPassword } from "../pages/ResetPassword";
 
 export default function Router() {
   return (
@@ -12,6 +14,8 @@ export default function Router() {
       <Route element={<GuestRoutes />}>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       {/* Protected Routes */}

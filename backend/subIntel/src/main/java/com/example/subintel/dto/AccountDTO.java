@@ -12,6 +12,7 @@ public class AccountDTO {
 	private String type;
 	private String subType;
 	private Double balance;
+	private String itemId;
 
 	public AccountDTO(AccountModel accountModel) {
 		// TODO Auto-generated constructor stub
@@ -21,5 +22,6 @@ public class AccountDTO {
 		this.type = accountModel.getType();
 		this.subType = accountModel.getSubType();
 		this.balance = accountModel.getBalance();
+		this.itemId = accountModel.getPlaidItemModel().getItemId();
 	}
 }

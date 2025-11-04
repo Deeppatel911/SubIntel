@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Box,
@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   Alert,
+  Grid,
 } from "@mui/material";
 
 export const Login = () => {
@@ -111,6 +112,16 @@ export const Login = () => {
           >
             {isSubmitting ? "Logging in..." : "Login"}
           </Button>
+
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link to="/forgot-password" style={{ textDecoration: "none" }}>
+                <Button variant="text" size="small">
+                  Forgot password?
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>

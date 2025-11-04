@@ -34,6 +34,10 @@ import com.plaid.client.model.TransactionsSyncRequest;
 import com.plaid.client.model.TransactionsSyncResponse;
 import com.plaid.client.request.PlaidApi;
 
+import com.plaid.client.model.ItemRemoveRequest;
+import com.plaid.client.model.ItemRemoveResponse;
+import jakarta.persistence.EntityNotFoundException;
+
 import retrofit2.Response;
 
 import org.slf4j.Logger;
@@ -244,5 +248,29 @@ public class PlaidService {
 			logger.error("An unexpected error occurred during the user-triggered transaction sync.", e);
 			return ResponseEntity.internalServerError().body("An error occurred during transaction sync.");
 		}
+	}
+
+	@Transactional
+	public void unlinkItem(UserModel user, String itemId) throws IOException {
+		logger.info("Attempting to unlink item ID: {} for user ID: {}", itemId, user.getId());
+
+		PlaidItemModel plaidItem = plaidItemRepository.findByItemIdAndUserModel_Id(itemId, user.getId()).orElseThrow(
+				() -> new EntityNotFoundException("No Plaid item found with ID " + itemId + " for this user."));
+
+		try {
+			ItemRemoveRequest request = new ItemRemoveRequest().accessToken(plaidItem.getAccessToken());
+			Response<ItemRemoveResponse> response = plaidApi.itemRemove(request).execute();
+			if (response.isSuccessful()) {
+				logger.info("Successfully removed item {} from Plaid.", itemId);
+			} else {
+				logger.warn("Could not remove item {} from Plaid. Response: {}", itemId, response.errorBody().string());
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error("Error calling Plaid's /item/remove API: {}", e.getMessage());
+		}
+
+		plaidItemRepository.delete(plaidItem);
+		logger.info("Successfully unlinked item ID: {} from local database for user ID: {}", itemId, user.getId());
 	}
 }

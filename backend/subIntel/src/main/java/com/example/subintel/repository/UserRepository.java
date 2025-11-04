@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
 	
 	@Query("SELECT u FROM UserModel u LEFT JOIN FETCH u.plaidItems")
     List<UserModel> findAllWithPlaidItems();
+	
+	Optional<UserModel> findByResetPasswordToken(String token);
 }
