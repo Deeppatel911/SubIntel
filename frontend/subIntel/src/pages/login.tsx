@@ -122,6 +122,16 @@ export const Login = () => {
               </Link>
             </Grid>
           </Grid>
+
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link to="/register" style={{ textDecoration: "none" }}>
+                <Button variant="text" size="small">
+                  Don't have an account? Register
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>

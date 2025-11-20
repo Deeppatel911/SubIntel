@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Box,
@@ -140,6 +140,16 @@ export const Register = () => {
           >
             {isSubmitting ? "Registering..." : "Register"}
           </Button>
+
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link to="/login" style={{ textDecoration: "none" }}>
+                <Button variant="text" size="small">
+                  Already have an account? Login
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>

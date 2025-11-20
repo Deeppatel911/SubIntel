@@ -21,6 +21,7 @@ export default function Router() {
       {/* Protected Routes */}
       <Route element={<ProtectedRoutes />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
       </Route>
     </Routes>
   );
