@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+    db:
+        image: postgres:15-alpine
+        container_name: subintel-db
+        environment:
+            POSTGRES_DB: subIntelDB
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - app-network
+    
+    backend:
+        build: ./backend
+        container_name: subintel-backend
+        ports:
+            - "8080:8080"
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/subIntelDB
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: password
+            
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            PLAID_CLIENT_ID: ${PLAID_CLIENT_ID}
+            PLAID_SECRET_SANDBOX: ${PLAID_SECRET_SANDBOX}
+            PLAID_ENV: ${PLAID_ENV}
+        depends_on:
+            - db
+        networks:
+            - app-network
+    
+    frontend:
+        build: ./frontend
+        container_name: subintel-frontend
+        ports:
+            - "3000:80"
+        depends_on:
+            - backend
+        networks:
+            - app-network
+
+volumes:
+    postgres_data:
+
+networks:
+    app-network:
+        driver: bridge

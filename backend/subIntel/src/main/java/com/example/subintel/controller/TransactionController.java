@@ -36,15 +36,18 @@ public class TransactionController {
 
 	@GetMapping
 	public ResponseEntity<?> getTransactions() {
-		try { // Add try block
+		try {
 			logger.info("Received GET request for transactions");
+
+			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+			UserModel user = userRepository.findByEmail(userEmail)
+					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 			// List<TransactionModel>
-			List<TransactionDTO> transactions = transactionService.getTransactionsForCurrentUser();
+			List<TransactionDTO> transactions = transactionService.getTransactionsForCurrentUser(user.getId());
 			logger.info("Returning {} transactions", transactions.size());
 			return ResponseEntity.ok(transactions);
 		} catch (Exception e) { // Add catch block
 			logger.error("Error processing GET /api/transactions", e);
-			// Return a 500 error explicitly
 			return ResponseEntity.internalServerError().build();
 		}
 

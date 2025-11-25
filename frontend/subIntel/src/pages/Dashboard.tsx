@@ -284,12 +284,12 @@ export const Dashboard = () => {
                 alignItems: "center",
               }}
             >
-              <Grid item>
+              <Grid>
                 {" "}
                 {/* Added item prop */}
                 <LinkAccount />
               </Grid>
-              <Grid item>
+              <Grid>
                 {" "}
                 {/* Added item prop */}
                 <Button
@@ -305,7 +305,7 @@ export const Dashboard = () => {
                   {isLoading ? "Syncing..." : "Sync Transactions"}
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={4} sx={{ ml: "auto" }}>
+              <Grid size={{xs:12, sm:4  }} sx={{ ml: 'auto' }}>
                 {/* Added item prop */}
                 <FormControl fullWidth size="small">
                   <InputLabel id="account-filter-label">
@@ -351,7 +351,7 @@ export const Dashboard = () => {
           {/* --- Main Content Grid --- */}
           <Grid container spacing={3}>
             {/* --- Spending Chart --- */}
-            <Grid item xs={12} md={5}>
+            <Grid size={{xs:12, md:5}}>
               <Card sx={{ height: "100%" }}>
                 <CardContent
                   sx={{
@@ -378,7 +378,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Spending Trend Chart --- */}
-            <Grid item xs={12} md={7}>
+            <Grid size={{xs:12, md:7}}>
               <Card sx={{ height: "100%" }}>
                 <CardContent
                   sx={{
@@ -395,7 +395,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Subscriptions --- */}
-            <Grid item xs={12} md={7}>
+            <Grid size={{xs:12, md:7}}>
               <Card>
                 <CardContent>
                   <Box
@@ -485,7 +485,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Transactions --- */}
-            <Grid item xs={12} md={5}>
+            <Grid size={{xs:12, md:5}}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>

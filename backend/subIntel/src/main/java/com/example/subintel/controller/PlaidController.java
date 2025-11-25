@@ -37,17 +37,29 @@ public class PlaidController {
 
 	@PostMapping("/create_link_token")
 	public ResponseEntity<?> createLinkToken() {
-		return plaidService.createLinkToken();
+		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		UserModel user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+		return plaidService.createLinkToken(user.getId());
 	}
 
 	@PostMapping("/exchange_public_token")
 	public ResponseEntity<?> exchangePublicToken(@RequestBody ExchangePublicToken publicTokenRequest) {
-		return plaidService.exchangePublicToken(publicTokenRequest);
+		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		UserModel user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+		return plaidService.exchangePublicToken(user, publicTokenRequest);
 	}
 
 	@PostMapping("/transactions")
 	public ResponseEntity<?> syncTransactions() {
-		return plaidService.fetchAndSaveTransactionsForCurrentUser();
+		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		UserModel user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+		return plaidService.fetchAndSaveTransactionsForCurrentUser(user);
 	}
 
 	@DeleteMapping("/item/{itemId}")

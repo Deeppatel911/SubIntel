@@ -69,7 +69,6 @@ export const Register = () => {
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
-            {/* <Grid item xs={12} sm={6}> */}
             <TextField
               autoComplete="given-name"
               name="firstName"
@@ -82,8 +81,6 @@ export const Register = () => {
               onChange={handleChange}
               disabled={isSubmitting}
             />
-            {/* </Grid> */}
-            {/* <Grid item xs={12} sm={6}> */}
             <TextField
               required
               fullWidth
@@ -95,8 +92,6 @@ export const Register = () => {
               onChange={handleChange}
               disabled={isSubmitting}
             />
-            {/* </Grid> */}
-            {/* <Grid item xs={12}> */}
             <TextField
               required
               fullWidth
@@ -108,8 +103,6 @@ export const Register = () => {
               onChange={handleChange}
               disabled={isSubmitting}
             />
-            {/* </Grid> */}
-            {/* <Grid item xs={12}> */}
             <TextField
               required
               fullWidth
@@ -142,7 +135,7 @@ export const Register = () => {
           </Button>
 
           <Grid container justifyContent="flex-end">
-            <Grid item>
+            <Grid>
               <Link to="/login" style={{ textDecoration: "none" }}>
                 <Button variant="text" size="small">
                   Already have an account? Login

@@ -15,7 +15,6 @@ import com.example.subintel.dto.RegisterRequest;
 import com.example.subintel.model.UserModel;
 import com.example.subintel.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;

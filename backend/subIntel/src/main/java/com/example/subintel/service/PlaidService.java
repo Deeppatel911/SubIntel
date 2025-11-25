@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +18,6 @@ import com.example.subintel.model.UserModel;
 import com.example.subintel.repository.AccountRepository;
 import com.example.subintel.repository.PlaidItemRepository;
 import com.example.subintel.repository.TransactionRepository;
-import com.example.subintel.repository.UserRepository;
 import com.plaid.client.model.AccountBase;
 import com.plaid.client.model.CountryCode;
 import com.plaid.client.model.ItemPublicTokenExchangeRequest;
@@ -47,31 +44,26 @@ import org.slf4j.LoggerFactory;
 public class PlaidService {
 	private static final Logger logger = LoggerFactory.getLogger(PlaidService.class);
 
-	private UserRepository userRepository;
 	private PlaidApi plaidApi;
 	private PlaidItemRepository plaidItemRepository;
 	private AccountRepository accountRepository;
 	private TransactionRepository transactionRepository;
 
-	public PlaidService(UserRepository userRepository, PlaidApi plaidApi, PlaidItemRepository plaidItemRepository,
-			AccountRepository accountRepository, TransactionRepository transactionRepository) {
+	public PlaidService(PlaidApi plaidApi, PlaidItemRepository plaidItemRepository, AccountRepository accountRepository,
+			TransactionRepository transactionRepository) {
 		super();
-		this.userRepository = userRepository;
 		this.plaidApi = plaidApi;
 		this.plaidItemRepository = plaidItemRepository;
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;
 	}
 
-	public ResponseEntity<?> createLinkToken() {
+	public ResponseEntity<?> createLinkToken(Long userId) {
 		// TODO Auto-generated method stub
 		try {
-			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-			UserModel user = userRepository.findByEmail(userEmail)
-					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 			LinkTokenCreateRequestUser userpayload = new LinkTokenCreateRequestUser()
-					.clientUserId(String.valueOf(user.getId()));
+					.clientUserId(String.valueOf(userId));
 			LinkTokenCreateRequest linkTokenCreateRequest = new LinkTokenCreateRequest().user(userpayload)
 					.clientName("SubIntel").products(List.of(Products.TRANSACTIONS))
 					.countryCodes(List.of(CountryCode.US)).language("en");
@@ -93,12 +85,8 @@ public class PlaidService {
 		}
 	}
 
-	public ResponseEntity<?> exchangePublicToken(ExchangePublicToken exchangePublicToken) {
+	public ResponseEntity<?> exchangePublicToken(UserModel user, ExchangePublicToken exchangePublicToken) {
 		try {
-			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-			UserModel user = userRepository.findByEmail(userEmail)
-					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
 			if (exchangePublicToken.getPublicToken() == null || exchangePublicToken.getPublicToken().isBlank()) {
 				return ResponseEntity.badRequest().body("public_token is required");
 			}
@@ -144,11 +132,6 @@ public class PlaidService {
 	@Transactional
 	public void fetchAndSaveTransactions(UserModel user) throws IOException {
 		try {
-			// String userEmail =
-			// SecurityContextHolder.getContext().getAuthentication().getName();
-			// UserModel user = userRepository.findByEmail(userEmail)
-			// .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
 			List<PlaidItemModel> plaidItems = user.getPlaidItems();// .stream().findFirst()
 			// .orElseThrow(() -> new IllegalStateException("No linked account found for
 			// this user."));
@@ -235,12 +218,8 @@ public class PlaidService {
 		}
 	}
 
-	public ResponseEntity<?> fetchAndSaveTransactionsForCurrentUser() {
+	public ResponseEntity<?> fetchAndSaveTransactionsForCurrentUser(UserModel user) {
 		try {
-			String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-			UserModel user = userRepository.findByEmail(userEmail)
-					.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
 			fetchAndSaveTransactions(user);
 			return ResponseEntity.ok(Collections.singletonMap("message", "Transaction sync initiated for all items."));
 		} catch (Exception e) {

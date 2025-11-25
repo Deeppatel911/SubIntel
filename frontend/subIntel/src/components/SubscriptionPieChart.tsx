@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 
@@ -78,7 +78,7 @@ const SubscriptionPieChart = () => {
   }
 
   return (
-    <div style={{ maxWidth: "400px", margin: "20px auto" }}>
+    <div style={{ maxWidth: "100%", margin: "20px auto" }}>
       <Pie data={dataForChart} />
     </div>
   );

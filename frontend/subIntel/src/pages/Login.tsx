@@ -114,7 +114,7 @@ export const Login = () => {
           </Button>
 
           <Grid container justifyContent="flex-end">
-            <Grid item>
+            <Grid>
               <Link to="/forgot-password" style={{ textDecoration: "none" }}>
                 <Button variant="text" size="small">
                   Forgot password?
@@ -124,7 +124,7 @@ export const Login = () => {
           </Grid>
 
           <Grid container justifyContent="flex-end">
-            <Grid item>
+            <Grid>
               <Link to="/register" style={{ textDecoration: "none" }}>
                 <Button variant="text" size="small">
                   Don't have an account? Register
