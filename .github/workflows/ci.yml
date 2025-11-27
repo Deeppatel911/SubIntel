@@ -43,6 +43,11 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/subIntelDB
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: password
+          
+          JWT_SECRET_KEY: test_jwt_secret_key_must_be_long_enough_for_hs256
+          PLAID_CLIENT_ID: test_plaid_client_id
+          PLAID_SECRET_SANDBOX: test_plaid_secret
+          PLAID_ENV: sandbox
         run: mvn test
 
       - name: Build Backend JAR
