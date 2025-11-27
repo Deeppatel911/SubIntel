@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: .SubIntel/backend
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
     needs: build_backend
     defaults:
       run:
-        working-directory: ./frontend/subIntel 
+        working-directory: .SubIntel/frontend/subIntel 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
