@@ -16,7 +16,7 @@ services:
             - app-network
     
     backend:
-        image: ${{ secrets.DOCKER_USERNAME }}/subintel-backend:latest
+        image: ${DOCKER_USERNAME}/subintel-backend:latest
         #build: ./backend
         container_name: subintel-backend
         ports:
@@ -36,7 +36,7 @@ services:
             - app-network
     
     frontend:
-        image: ${{ secrets.DOCKER_USERNAME }}/subintel-frontend:latest
+        image: ${DOCKER_USERNAME}/subintel-frontend:latest
         #build: ./frontend
         container_name: subintel-frontend
         ports:
