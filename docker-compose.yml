@@ -30,6 +30,7 @@ services:
             PLAID_CLIENT_ID: ${PLAID_CLIENT_ID}
             PLAID_SECRET_SANDBOX: ${PLAID_SECRET_SANDBOX}
             PLAID_ENV: ${PLAID_ENV}
+            FRONTEND_URL: ${FRONTEND_URL}
         depends_on:
             - db
         networks:

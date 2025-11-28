@@ -10,7 +10,7 @@ const LinkAccount = () => {
     const createLinkToken = async () => {
       try {
         const response = await fetch(
-          `${apiUrl}/plaid/create_link_token`,
+          `${apiUrl}/api/plaid/create_link_token`,
           {
             method: "POST",
             headers: {
