@@ -48,7 +48,7 @@ jobs:
           PLAID_CLIENT_ID: test_plaid_client_id
           PLAID_SECRET_SANDBOX: test_plaid_secret
           PLAID_ENV: sandbox
-          FRONTEND_URL=http://localhost:3000
+          FRONTEND_URL: http://localhost:3000
         run: mvn test
 
       - name: Build Backend JAR
