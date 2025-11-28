@@ -381,7 +381,7 @@ export const Dashboard = () => {
                   }}
                 >
                   <Box sx={{ flexGrow: 1, position: "relative" }}>
-                    <SpendingLineChart />
+                    <SpendingLineChart key={chartVersion} />
                   </Box>
                 </CardContent>
               </Card>
