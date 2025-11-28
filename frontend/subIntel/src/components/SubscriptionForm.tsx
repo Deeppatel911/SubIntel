@@ -38,13 +38,13 @@ interface FormData {
   nextDueDate?: string;
 }
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
   onClose,
   onSuccess,
   existingSubscription,
 }) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
   const isEditMode = !!existingSubscription;
   const [formData, setFormData] = useState<FormData>({
     merchantName: "",

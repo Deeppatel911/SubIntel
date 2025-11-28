@@ -27,9 +27,9 @@ interface TrendData {
   totalAmount: number;
 }
 
-const SpendingLineChart = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+const SpendingLineChart = () => {
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

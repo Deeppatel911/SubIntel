@@ -8,9 +8,9 @@ interface SpendingData {
   [key: string]: number;
 }
 
-const SubscriptionPieChart = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+const SubscriptionPieChart = () => {
   const [chartData, setChartData] = useState<SpendingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

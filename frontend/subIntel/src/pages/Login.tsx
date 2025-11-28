@@ -10,9 +10,9 @@ import {
   Grid,
 } from "@mui/material";
 
-export const Login = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+export const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",

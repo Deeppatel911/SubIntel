@@ -9,9 +9,9 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-export const ForgotPassword = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const LinkAccount = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-  
   const [linkToken, setLinkToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,7 @@ const LinkAccount = () => {
       const exchangeToken = async () => {
         try {
           const jwtToken = localStorage.getItem("jwtToken");
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
           const response = await fetch(
             `${apiUrl}/api/plaid/exchange_public_token`,
             {

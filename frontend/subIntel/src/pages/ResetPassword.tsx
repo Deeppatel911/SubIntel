@@ -9,9 +9,9 @@ import {
   Alert,
 } from "@mui/material";
 
-export const ResetPassword = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");

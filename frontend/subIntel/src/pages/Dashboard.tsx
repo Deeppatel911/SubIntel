@@ -75,9 +75,9 @@ const modalStyle = {
   borderRadius: 2,
 };
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 export const Dashboard = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-  
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
