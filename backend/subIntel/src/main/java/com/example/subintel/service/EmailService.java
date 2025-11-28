@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.example.subintel.model.SubscriptionModel;
 import com.example.subintel.model.UserModel;
 
+import org.springframework.beans.factory.annotation.Value;
+
 @Service
 public class EmailService {
 	@Value("${app.frontend.url}")
