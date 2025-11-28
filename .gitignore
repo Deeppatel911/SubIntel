@@ -31,3 +31,5 @@ backend/logs/
 backend/src/main/resources/application.properties
 
 .env
+
+.subintel-key.pem
