@@ -36,14 +36,12 @@ const SpendingLineChart = () => {
       setIsLoading(true);
       try {
         const jwtToken = localStorage.getItem("jwtToken");
-        const response = await fetch(
-          "http://localhost:8080/api/transactions/trends",
-          {
-            headers: {
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+        const response = await fetch(`${apiUrl}/api/transactions/trends`, {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        });
 
         if (response.ok) {
           const data: TrendData[] = await response.json();

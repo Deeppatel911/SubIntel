@@ -214,13 +214,11 @@ export const Dashboard = () => {
 
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const response = await fetch(
-        `http://localhost:8080/api/plaid/item/${itemId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${jwtToken}` },
-        }
-      );
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const response = await fetch(`${apiUrl}/${itemId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
 
       if (response.ok) {
         setSelectedAccountId("all");
@@ -270,7 +268,7 @@ export const Dashboard = () => {
           flexGrow: 1,
           bgcolor: "background.default",
           p: 3,
-          mt: 8, 
+          mt: 8,
         }}
       >
         <Container maxWidth="lg">
@@ -305,7 +303,7 @@ export const Dashboard = () => {
                   {isLoading ? "Syncing..." : "Sync Transactions"}
                 </Button>
               </Grid>
-              <Grid size={{xs:12, sm:4  }} sx={{ ml: 'auto' }}>
+              <Grid size={{ xs: 12, sm: 4 }} sx={{ ml: "auto" }}>
                 {/* Added item prop */}
                 <FormControl fullWidth size="small">
                   <InputLabel id="account-filter-label">
@@ -351,7 +349,7 @@ export const Dashboard = () => {
           {/* --- Main Content Grid --- */}
           <Grid container spacing={3}>
             {/* --- Spending Chart --- */}
-            <Grid size={{xs:12, md:5}}>
+            <Grid size={{ xs: 12, md: 5 }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent
                   sx={{
@@ -378,7 +376,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Spending Trend Chart --- */}
-            <Grid size={{xs:12, md:7}}>
+            <Grid size={{ xs: 12, md: 7 }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent
                   sx={{
@@ -395,7 +393,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Subscriptions --- */}
-            <Grid size={{xs:12, md:7}}>
+            <Grid size={{ xs: 12, md: 7 }}>
               <Card>
                 <CardContent>
                   <Box
@@ -485,7 +483,7 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Transactions --- */}
-            <Grid size={{xs:12, md:5}}>
+            <Grid size={{ xs: 12, md: 5 }}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>

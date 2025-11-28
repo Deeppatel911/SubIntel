@@ -17,8 +17,9 @@ const SubscriptionPieChart = () => {
       setIsLoading(true);
       try {
         const jwtToken = localStorage.getItem("jwtToken");
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
         const response = await fetch(
-          "http://localhost:8080/api/subscriptions/spending-summary",
+          `${apiUrl}/api/subscriptions/spending-summary`,
           {
             headers: { Authorization: `Bearer ${jwtToken}` },
           }

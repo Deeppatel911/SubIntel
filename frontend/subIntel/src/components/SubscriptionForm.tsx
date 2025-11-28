@@ -115,9 +115,10 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
 
     try {
       const jwtToken = localStorage.getItem("jwtToken");
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const url = isEditMode
-        ? `http://localhost:8080/api/subscriptions/${existingSubscription?.subscriptionId}`
-        : "http://localhost:8080/api/subscriptions";
+        ? `${apiUrl}/api/subscriptions/${existingSubscription?.subscriptionId}`
+        : `${apiUrl}/api/subscriptions`;
       const method = isEditMode ? "PUT" : "POST";
 
       const response = await fetch(url, {

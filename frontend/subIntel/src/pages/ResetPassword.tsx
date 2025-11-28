@@ -38,14 +38,12 @@ export const ResetPassword = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/auth/reset-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: token, newPassword: password }),
-        }
-      );
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const response = await fetch(`${apiUrl}/api/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, newPassword: password }),
+      });
 
       const data = await response.json();
 
