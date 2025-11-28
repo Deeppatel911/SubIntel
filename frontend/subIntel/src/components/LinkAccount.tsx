@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
 const LinkAccount = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  
   const [linkToken, setLinkToken] = useState<string | null>(null);
 
   useEffect(() => {
     const createLinkToken = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/plaid/create_link_token",
+          `${apiUrl}/plaid/create_link_token`,
           {
             method: "POST",
             headers: {
@@ -42,8 +44,6 @@ const LinkAccount = () => {
       const exchangeToken = async () => {
         try {
           const jwtToken = localStorage.getItem("jwtToken");
-          const apiUrl =
-            import.meta.env.VITE_API_URL || "http://localhost:8080";
           const response = await fetch(
             `${apiUrl}/api/plaid/exchange_public_token`,
             {

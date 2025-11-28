@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 
 export const Login = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,7 +30,6 @@ export const Login = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {

@@ -76,6 +76,8 @@ const modalStyle = {
 };
 
 export const Dashboard = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +96,7 @@ export const Dashboard = () => {
     setIsAccountsLoading(true);
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const response = await fetch("http://localhost:8080/api/accounts", {
+      const response = await fetch(`${apiUrl}/api/accounts`, {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
       if (response.ok) setAccounts(await response.json());
@@ -110,7 +112,7 @@ export const Dashboard = () => {
     setIsSubLoading(true);
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const response = await fetch("http://localhost:8080/api/subscriptions", {
+      const response = await fetch(`${apiUrl}/api/subscriptions`, {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
       if (response.ok) setSubscriptions(await response.json());
@@ -132,20 +134,17 @@ export const Dashboard = () => {
     setTransactions([]);
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      await fetch("http://localhost:8080/api/plaid/transactions", {
+      await fetch(`${apiUrl}/api/plaid/transactions`, {
         method: "POST",
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
-      await fetch("http://localhost:8080/api/subscriptions/detect", {
+      await fetch(`${apiUrl}/api/subscriptions/detect`, {
         method: "POST",
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
-      const transResponse = await fetch(
-        "http://localhost:8080/api/transactions",
-        {
-          headers: { Authorization: `Bearer ${jwtToken}` },
-        }
-      );
+      const transResponse = await fetch(`${apiUrl}/api/transactions`, {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
       if (transResponse.ok) setTransactions(await transResponse.json());
       await fetchAccounts();
       await fetchSubscriptions().then(() => {
@@ -168,7 +167,7 @@ export const Dashboard = () => {
     try {
       const jwtToken = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `http://localhost:8080/api/subscriptions/${subscriptionId}`,
+        `${apiUrl}/api/subscriptions/${subscriptionId}`,
         { method: "DELETE", headers: { Authorization: `Bearer ${jwtToken}` } }
       );
       if (response.ok) {
@@ -214,8 +213,7 @@ export const Dashboard = () => {
 
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-      const response = await fetch(`${apiUrl}/${itemId}`, {
+      const response = await fetch(`${apiUrl}api/plaid/item/${itemId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
@@ -225,12 +223,9 @@ export const Dashboard = () => {
         await fetchAccounts();
         await fetchSubscriptions();
 
-        const transResponse = await fetch(
-          "http://localhost:8080/api/transactions",
-          {
-            headers: { Authorization: `Bearer ${jwtToken}` },
-          }
-        );
+        const transResponse = await fetch(`${apiUrl}/api/transactions`, {
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        });
         if (transResponse.ok) setTransactions(await transResponse.json());
         else setTransactions([]);
       } else {

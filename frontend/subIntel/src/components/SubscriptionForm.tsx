@@ -43,6 +43,8 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
   onSuccess,
   existingSubscription,
 }) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const isEditMode = !!existingSubscription;
   const [formData, setFormData] = useState<FormData>({
     merchantName: "",
@@ -115,7 +117,6 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
 
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const url = isEditMode
         ? `${apiUrl}/api/subscriptions/${existingSubscription?.subscriptionId}`
         : `${apiUrl}/api/subscriptions`;

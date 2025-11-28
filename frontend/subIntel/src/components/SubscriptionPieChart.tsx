@@ -9,6 +9,8 @@ interface SpendingData {
 }
 
 const SubscriptionPieChart = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [chartData, setChartData] = useState<SpendingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +19,6 @@ const SubscriptionPieChart = () => {
       setIsLoading(true);
       try {
         const jwtToken = localStorage.getItem("jwtToken");
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
         const response = await fetch(
           `${apiUrl}/api/subscriptions/spending-summary`,
           {

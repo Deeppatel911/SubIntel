@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 
 export const Register = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +33,6 @@ export const Register = () => {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const response = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         headers: {

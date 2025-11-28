@@ -28,6 +28,8 @@ interface TrendData {
 }
 
 const SpendingLineChart = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +38,6 @@ const SpendingLineChart = () => {
       setIsLoading(true);
       try {
         const jwtToken = localStorage.getItem("jwtToken");
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
         const response = await fetch(`${apiUrl}/api/transactions/trends`, {
           headers: {
             Authorization: `Bearer ${jwtToken}`,

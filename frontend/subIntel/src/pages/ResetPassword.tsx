@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 
 export const ResetPassword = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
@@ -38,7 +40,6 @@ export const ResetPassword = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const response = await fetch(`${apiUrl}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

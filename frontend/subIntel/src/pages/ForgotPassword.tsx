@@ -10,6 +10,8 @@ import {
 import { Link } from "react-router-dom";
 
 export const ForgotPassword = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,6 @@ export const ForgotPassword = () => {
     setMessage(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
       const response = await fetch(`${apiUrl}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
