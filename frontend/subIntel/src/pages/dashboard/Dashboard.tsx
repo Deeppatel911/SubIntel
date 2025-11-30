@@ -437,6 +437,7 @@ export const Dashboard = () => {
                               onClick={() => setEditingSubscription(sub)}
                               size="small"
                               color="primary"
+                              aria-label="edit subscription"
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
@@ -446,6 +447,7 @@ export const Dashboard = () => {
                               }
                               size="small"
                               color="error"
+                              aria-label="delete subscription"
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
