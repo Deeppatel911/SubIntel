@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import LinkAccount from "../../components/LinkAccount";
 import SubscriptionPieChart from "../../components/SubscriptionPieChart";
 import SubscriptionForm from "../../components/SubscriptionForm";
@@ -24,16 +23,12 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  AppBar,
-  Toolbar,
-  CssBaseline,
   type SelectChangeEvent,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Grid from "@mui/material/Grid";
-import LogoutIcon from "@mui/icons-material/Logout";
 import SpendingLineChart from "../../components/SpendingLineChart";
 
 interface Transaction {
@@ -78,7 +73,6 @@ const modalStyle = {
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const Dashboard = () => {
-  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -194,11 +188,6 @@ export const Dashboard = () => {
     setEditingSubscription(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
-    navigate("/login");
-  };
-
   const filteredTransactions = transactions.filter(
     (t) => selectedAccountId === "all" || t.accountId === selectedAccountId
   );
@@ -240,394 +229,339 @@ export const Dashboard = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
-      <CssBaseline />
-
-      {/* --- App Bar (Header) --- */}
-      <AppBar
-        position="static"
-        color="default"
-        elevation={0}
-        sx={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}
-      >
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontWeight: "bold", letterSpacing: 1 }}
+    <Container maxWidth={false} sx={{ mt: 4, mb: 8 }}>
+      {/* --- Top Control Bar --- */}
+      <Card sx={{ mb: 3, p: 1 }}>
+        <CardContent
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+            paddingBottom: "16px !important",
+          }}
+        >
+          <Grid>
+            {" "}
+            {/* Added item prop */}
+            <LinkAccount />
+          </Grid>
+          <Grid>
+            {" "}
+            {/* Added item prop */}
+            <Button
+              variant="contained"
+              onClick={handleSyncTransactions}
+              disabled={isLoading}
+              startIcon={
+                isLoading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : null
+              }
+            >
+              {isLoading ? "Syncing..." : "Sync Transactions"}
+            </Button>
+          </Grid>
+          <Grid
+            size={{ xs: 12, sm: 4 }}
+            sx={{ display: "flex", justifyContent: "flex-end" }}
           >
-            SubIntel
-          </Typography>
-          <Button
-            color="inherit"
-            onClick={handleLogout}
-            startIcon={<LogoutIcon />}
-          >
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
+            {/* Added item prop */}
+            <FormControl sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <InputLabel id="account-filter-label">
+                Filter by Account
+              </InputLabel>
+              <Select
+                labelId="account-filter-label"
+                value={selectedAccountId}
+                label="Filter by Account"
+                onChange={handleAccountChange}
+                disabled={isAccountsLoading}
+              >
+                <MenuItem value="all">All Accounts</MenuItem>
+                {accounts.map((acc) => (
+                  <MenuItem
+                    key={acc.accountId}
+                    value={acc.accountId}
+                    sx={{ justifyContent: "space-between" }}
+                  >
+                    <span>
+                      {acc.name} ({acc.officialName})
+                    </span>
+                    <Button
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUnlinkAccount(acc.itemId, acc.name);
+                      }}
+                      sx={{ ml: 2 }}
+                    >
+                      Unlink
+                    </Button>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </CardContent>
+      </Card>
 
-      {/* --- Main Content Area --- */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 0,
-          width: "100%",
-        }}
-      >
-        <Container maxWidth={false} sx={{ mt: 4, mb: 8 }}>
-          {/* --- Top Control Bar --- */}
-          <Card sx={{ mb: 3, p: 1 }}>
+      {/* --- Main Content Grid --- */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        {/* --- Spending Chart --- */}
+        <Grid size={{ xs: 12, md: 5 }}>
+          <Card
+            sx={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <CardContent
+              sx={{
+                flexGrow: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="h6" gutterBottom align="center">
+                Subscription Distribution
+              </Typography>
+              <Box
+                sx={{
+                  position: "relative",
+                  height: "300px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <SubscriptionPieChart key={chartVersion} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* --- Spending Trend Chart --- */}
+        <Grid size={{ xs: 12, md: 7 }}>
+          <Card sx={{ height: "100%" }}>
             <CardContent
               sx={{
                 display: "flex",
-                flexWrap: "wrap",
-                gap: 2,
-                alignItems: "center",
-                paddingBottom: "16px !important",
+                flexDirection: "column",
+                height: "100%",
               }}
             >
-              <Grid>
-                {" "}
-                {/* Added item prop */}
-                <LinkAccount />
-              </Grid>
-              <Grid>
-                {" "}
-                {/* Added item prop */}
-                <Button
-                  variant="contained"
-                  onClick={handleSyncTransactions}
-                  disabled={isLoading}
-                  startIcon={
-                    isLoading ? (
-                      <CircularProgress size={20} color="inherit" />
-                    ) : null
-                  }
-                >
-                  {isLoading ? "Syncing..." : "Sync Transactions"}
-                </Button>
-              </Grid>
-              <Grid
-                size={{ xs: 12, sm: 4 }}
-                sx={{ display: "flex", justifyContent: "flex-end" }}
-              >
-                {/* Added item prop */}
-                <FormControl
-                  sx={{ display: "flex", justifyContent: "flex-end" }}
-                >
-                  <InputLabel id="account-filter-label">
-                    Filter by Account
-                  </InputLabel>
-                  <Select
-                    labelId="account-filter-label"
-                    value={selectedAccountId}
-                    label="Filter by Account"
-                    onChange={handleAccountChange}
-                    disabled={isAccountsLoading}
-                  >
-                    <MenuItem value="all">All Accounts</MenuItem>
-                    {accounts.map((acc) => (
-                      <MenuItem
-                        key={acc.accountId}
-                        value={acc.accountId}
-                        sx={{ justifyContent: "space-between" }}
-                      >
-                        <span>
-                          {acc.name} ({acc.officialName})
-                        </span>
-                        <Button
-                          size="small"
-                          color="error"
-                          variant="outlined"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUnlinkAccount(acc.itemId, acc.name);
-                          }}
-                          sx={{ ml: 2 }}
-                        >
-                          Unlink
-                        </Button>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+              <Typography variant="h6" gutterBottom align="center">
+                Monthly Spending Trend
+              </Typography>
+              <Box sx={{ height: "300px" }}>
+                <SpendingLineChart key={chartVersion} />
+              </Box>
             </CardContent>
           </Card>
+        </Grid>
 
-          {/* --- Main Content Grid --- */}
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            {/* --- Spending Chart --- */}
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Card
+        {/* --- Subscriptions --- */}
+        <Grid size={{ xs: 12, md: 7 }}>
+          <Card>
+            <CardContent>
+              <Box
                 sx={{
-                  height: "100%",
                   display: "flex",
-                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
                 }}
               >
-                <CardContent
-                  sx={{
-                    flexGrow: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
+                <Typography variant="h6">Subscriptions</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setShowFormModal(true)}
+                  size="small"
                 >
-                  <Typography variant="h6" gutterBottom align="center">
-                    Subscription Distribution
-                  </Typography>
-                  <Box
-                    sx={{
-                      position: "relative",
-                      height: "300px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <SubscriptionPieChart key={chartVersion} />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* --- Spending Trend Chart --- */}
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom align="center">
-                    Monthly Spending Trend
-                  </Typography>
-                  <Box sx={{ height: "300px" }}>
-                    <SpendingLineChart key={chartVersion} />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* --- Subscriptions --- */}
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Card>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6">Subscriptions</Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={() => setShowFormModal(true)}
-                      size="small"
-                    >
-                      Add New
-                    </Button>
-                  </Box>
-                  <TableContainer sx={{ maxHeight: 400 }}>
-                    <Table stickyHeader size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Merchant</TableCell>
-                          <TableCell align="right">Amount</TableCell>
-                          <TableCell>Frequency</TableCell>
-                          <TableCell>Last Payment</TableCell>
-                          <TableCell>Next Due</TableCell>
-                          <TableCell align="center">Actions</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {isSubLoading && (
-                          <TableRow>
-                            <TableCell colSpan={6} align="center">
-                              <CircularProgress size={24} />
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {!isSubLoading && subscriptions.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={6} align="center">
-                              No subscriptions detected.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {!isSubLoading &&
-                          subscriptions.map((sub) => (
-                            <TableRow
-                              key={sub.subscriptionId}
-                              sx={{
-                                opacity: sub.isActive ? 1 : 0.5,
-                                "&:hover": { bgcolor: "action.hover" },
-                              }}
+                  Add New
+                </Button>
+              </Box>
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Merchant</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell>Frequency</TableCell>
+                      <TableCell>Last Payment</TableCell>
+                      <TableCell>Next Due</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {isSubLoading && (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <CircularProgress size={24} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isSubLoading && subscriptions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          No subscriptions detected.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isSubLoading &&
+                      subscriptions.map((sub) => (
+                        <TableRow
+                          key={sub.subscriptionId}
+                          sx={{
+                            opacity: sub.isActive ? 1 : 0.5,
+                            "&:hover": { bgcolor: "action.hover" },
+                          }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {sub.merchantName}
+                          </TableCell>
+                          <TableCell align="right">
+                            ${Math.abs(sub.estimatedAmount).toFixed(2)}
+                          </TableCell>
+                          <TableCell>{sub.frequency}</TableCell>
+                          <TableCell>{sub.lastPaymentDate}</TableCell>
+                          <TableCell>{sub.nextDueDate}</TableCell>
+                          <TableCell align="center" sx={{ p: 0 }}>
+                            <IconButton
+                              onClick={() => setEditingSubscription(sub)}
+                              size="small"
+                              color="primary"
                             >
-                              <TableCell component="th" scope="row">
-                                {sub.merchantName}
-                              </TableCell>
-                              <TableCell align="right">
-                                ${Math.abs(sub.estimatedAmount).toFixed(2)}
-                              </TableCell>
-                              <TableCell>{sub.frequency}</TableCell>
-                              <TableCell>{sub.lastPaymentDate}</TableCell>
-                              <TableCell>{sub.nextDueDate}</TableCell>
-                              <TableCell align="center" sx={{ p: 0 }}>
-                                <IconButton
-                                  onClick={() => setEditingSubscription(sub)}
-                                  size="small"
-                                  color="primary"
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() =>
-                                    handleDeleteSubscription(sub.subscriptionId)
-                                  }
-                                  size="small"
-                                  color="error"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* --- Transactions --- */}
-            <Grid size={{ xs: 12, lg: 5 }}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6">
-                      Transactions
-                    </Typography>
-                  </Box>
-                  <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-                    <Table stickyHeader size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Name</TableCell>
-                          <TableCell>Account</TableCell>
-                          <TableCell>Category</TableCell>
-                          <TableCell align="right">Amount</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {isLoading && (
-                          <TableRow>
-                            <TableCell colSpan={5} align="center">
-                              <CircularProgress size={24} />
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {!isLoading && filteredTransactions.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={5} align="center">
-                              No transactions found for selected account.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {!isLoading &&
-                          filteredTransactions.map((t) => (
-                            <TableRow
-                              key={t.id}
-                              sx={{
-                                "&:hover": { bgcolor: "action.hover" },
-                              }}
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              onClick={() =>
+                                handleDeleteSubscription(sub.subscriptionId)
+                              }
+                              size="small"
+                              color="error"
                             >
-                              {" "}
-                              {/* Corrected to <TableRow> */}
-                              <TableCell>{t.date}</TableCell>
-                              <TableCell>
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t.name}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t.accountName}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Box>
-                                  <Typography
-                                    variant="caption"
-                                    color="textSecondary"
-                                  >
-                                    {t.category}
-                                  </Typography>
-                                </Box>
-                              </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{
-                                  color:
-                                    t.amount < 0
-                                      ? "error.main"
-                                      : "success.main",
-                                }}
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* --- Transactions --- */}
+        <Grid size={{ xs: 12, lg: 5 }}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6">Transactions</Typography>
+              </Box>
+              <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Account</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {isLoading && (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          <CircularProgress size={24} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isLoading && filteredTransactions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          No transactions found for selected account.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {!isLoading &&
+                      filteredTransactions.map((t) => (
+                        <TableRow
+                          key={t.id}
+                          sx={{
+                            "&:hover": { bgcolor: "action.hover" },
+                          }}
+                        >
+                          <TableCell>{t.date}</TableCell>
+                          <TableCell>
+                            <Box>
+                              <Typography variant="body2">{t.name}</Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box>
+                              <Typography variant="body2">
+                                {t.accountName}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
                               >
-                                ${t.amount.toFixed(2)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                                {t.category}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell
+                            align="right"
+                            sx={{
+                              color:
+                                t.amount < 0 ? "error.main" : "success.main",
+                            }}
+                          >
+                            ${t.amount.toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-          {/* --- Add/Edit Modal (Consolidated) --- */}
-          <Modal
-            open={showFormModal || !!editingSubscription}
+      {/* --- Add/Edit Modal (Consolidated) --- */}
+      <Modal
+        open={showFormModal || !!editingSubscription}
+        onClose={handleFormClose}
+      >
+        <Box sx={modalStyle}>
+          <SubscriptionForm
             onClose={handleFormClose}
-          >
-            <Box sx={modalStyle}>
-              <SubscriptionForm
-                onClose={handleFormClose}
-                onSuccess={handleFormSuccess}
-                existingSubscription={editingSubscription}
-              />
-            </Box>
-          </Modal>
-        </Container>
-      </Box>
-    </Box>
+            onSuccess={handleFormSuccess}
+            existingSubscription={editingSubscription}
+          />
+        </Box>
+      </Modal>
+    </Container>
   );
 };

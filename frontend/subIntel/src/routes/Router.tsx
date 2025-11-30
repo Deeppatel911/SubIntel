@@ -4,12 +4,17 @@ import GuestRoutes from "./GuestRoutes";
 import React, { Suspense } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/material";
+import { Layout } from "../components/Layout";
 
 const Dashboard = React.lazy(() =>
-  import("../pages/dashboard/Dashboard").then((module) => ({ default: module.Dashboard }))
+  import("../pages/dashboard/Dashboard").then((module) => ({
+    default: module.Dashboard,
+  }))
 );
 const Register = React.lazy(() =>
-  import("../pages/auth/Register").then((module) => ({ default: module.Register }))
+  import("../pages/auth/Register").then((module) => ({
+    default: module.Register,
+  }))
 );
 const Login = React.lazy(() =>
   import("../pages/auth/Login").then((module) => ({ default: module.Login }))
@@ -43,18 +48,20 @@ export default function Router() {
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
-        {/* Public Routes */}
-        <Route element={<GuestRoutes />}>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-        </Route>
+        <Route element={<Layout />}>
+          {/* Public Routes */}
+          <Route element={<GuestRoutes />}>
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Route>
 
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoutes />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/" element={<Dashboard />} />
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
+          </Route>
         </Route>
       </Routes>
     </Suspense>
