@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
@@ -71,9 +72,9 @@ const LinkAccount = () => {
   });
 
   return (
-    <button onClick={() => open()} disabled={!ready}>
+    <Button variant="contained" onClick={() => open()} disabled={!ready}>
       Link a Bank Account
-    </button>
+    </Button>
   );
 };
 

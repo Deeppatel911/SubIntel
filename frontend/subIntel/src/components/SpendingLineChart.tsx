@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -77,9 +77,6 @@ const SpendingLineChart = () => {
 
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Monthly Spending Trend
-      </Typography>
       <Line data={dataForChart} />
     </Box>
   );

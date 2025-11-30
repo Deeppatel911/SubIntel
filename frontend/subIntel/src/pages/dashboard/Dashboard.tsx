@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LinkAccount from "../components/LinkAccount";
-import SubscriptionPieChart from "../components/SubscriptionPieChart";
-import SubscriptionForm from "../components/SubscriptionForm";
+import LinkAccount from "../../components/LinkAccount";
+import SubscriptionPieChart from "../../components/SubscriptionPieChart";
+import SubscriptionForm from "../../components/SubscriptionForm";
 import {
   Container,
   Box,
   Typography,
   Button,
-  Divider,
   Select,
   MenuItem,
   InputLabel,
@@ -34,7 +33,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Grid from "@mui/material/Grid";
-import SpendingLineChart from "../components/SpendingLineChart";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SpendingLineChart from "../../components/SpendingLineChart";
 
 interface Transaction {
   id: number;
@@ -240,41 +240,59 @@ export const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
       <CssBaseline />
 
       {/* --- App Bar (Header) --- */}
-      <AppBar position="fixed">
+      <AppBar
+        position="static"
+        color="default"
+        elevation={0}
+        sx={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, fontWeight: "bold", letterSpacing: 1 }}
+          >
             SubIntel
           </Typography>
-          <Button color="inherit" onClick={handleLogout}>
+          <Button
+            color="inherit"
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+          >
             Logout
           </Button>
         </Toolbar>
       </AppBar>
-      <Divider sx={{ mb: 3 }} />
 
       {/* --- Main Content Area --- */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          bgcolor: "background.default",
-          p: 3,
-          mt: 8,
+          p: 0,
+          width: "100%",
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={false} sx={{ mt: 4, mb: 8 }}>
           {/* --- Top Control Bar --- */}
-          <Card sx={{ mb: 3 }}>
+          <Card sx={{ mb: 3, p: 1 }}>
             <CardContent
               sx={{
                 display: "flex",
                 flexWrap: "wrap",
                 gap: 2,
                 alignItems: "center",
+                paddingBottom: "16px !important",
               }}
             >
               <Grid>
@@ -298,9 +316,14 @@ export const Dashboard = () => {
                   {isLoading ? "Syncing..." : "Sync Transactions"}
                 </Button>
               </Grid>
-              <Grid size={{ xs: 12, sm: 4 }} sx={{ ml: "auto" }}>
+              <Grid
+                size={{ xs: 12, sm: 4 }}
+                sx={{ display: "flex", justifyContent: "flex-end" }}
+              >
                 {/* Added item prop */}
-                <FormControl fullWidth size="small">
+                <FormControl
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
                   <InputLabel id="account-filter-label">
                     Filter by Account
                   </InputLabel>
@@ -342,26 +365,34 @@ export const Dashboard = () => {
           </Card>
 
           {/* --- Main Content Grid --- */}
-          <Grid container spacing={3}>
+          <Grid container spacing={3} sx={{ mb: 3 }}>
             {/* --- Spending Chart --- */}
             <Grid size={{ xs: 12, md: 5 }}>
-              <Card sx={{ height: "100%" }}>
+              <Card
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <CardContent
                   sx={{
+                    flexGrow: 1,
                     display: "flex",
                     flexDirection: "column",
-                    height: "100%",
+                    justifyContent: "center",
                   }}
                 >
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom align="center">
                     Subscription Distribution
                   </Typography>
                   <Box
                     sx={{
-                      flexGrow: 1,
+                      position: "relative",
+                      height: "300px",
                       display: "flex",
-                      alignItems: "center",
                       justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
                     <SubscriptionPieChart key={chartVersion} />
@@ -380,7 +411,10 @@ export const Dashboard = () => {
                     height: "100%",
                   }}
                 >
-                  <Box sx={{ flexGrow: 1, position: "relative" }}>
+                  <Typography variant="h6" gutterBottom align="center">
+                    Monthly Spending Trend
+                  </Typography>
+                  <Box sx={{ height: "300px" }}>
                     <SpendingLineChart key={chartVersion} />
                   </Box>
                 </CardContent>
@@ -404,12 +438,13 @@ export const Dashboard = () => {
                       variant="contained"
                       startIcon={<AddIcon />}
                       onClick={() => setShowFormModal(true)}
+                      size="small"
                     >
                       Add New
                     </Button>
                   </Box>
-                  <TableContainer component={Paper}>
-                    <Table size="small">
+                  <TableContainer sx={{ maxHeight: 400 }}>
+                    <Table stickyHeader size="small">
                       <TableHead>
                         <TableRow>
                           <TableCell>Merchant</TableCell>
@@ -439,7 +474,10 @@ export const Dashboard = () => {
                           subscriptions.map((sub) => (
                             <TableRow
                               key={sub.subscriptionId}
-                              sx={{ opacity: sub.isActive ? 1 : 0.5 }}
+                              sx={{
+                                opacity: sub.isActive ? 1 : 0.5,
+                                "&:hover": { bgcolor: "action.hover" },
+                              }}
                             >
                               <TableCell component="th" scope="row">
                                 {sub.merchantName}
@@ -456,7 +494,7 @@ export const Dashboard = () => {
                                   size="small"
                                   color="primary"
                                 >
-                                  <EditIcon />
+                                  <EditIcon fontSize="small" />
                                 </IconButton>
                                 <IconButton
                                   onClick={() =>
@@ -465,7 +503,7 @@ export const Dashboard = () => {
                                   size="small"
                                   color="error"
                                 >
-                                  <DeleteIcon />
+                                  <DeleteIcon fontSize="small" />
                                 </IconButton>
                               </TableCell>
                             </TableRow>
@@ -478,13 +516,22 @@ export const Dashboard = () => {
             </Grid>
 
             {/* --- Transactions --- */}
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Card>
+            <Grid size={{ xs: 12, lg: 5 }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Transactions
-                  </Typography>
-                  <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6">
+                      Transactions
+                    </Typography>
+                  </Box>
+                  <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
                     <Table stickyHeader size="small">
                       <TableHead>
                         <TableRow>
@@ -512,14 +559,48 @@ export const Dashboard = () => {
                         )}
                         {!isLoading &&
                           filteredTransactions.map((t) => (
-                            <TableRow key={t.id}>
+                            <TableRow
+                              key={t.id}
+                              sx={{
+                                "&:hover": { bgcolor: "action.hover" },
+                              }}
+                            >
                               {" "}
                               {/* Corrected to <TableRow> */}
                               <TableCell>{t.date}</TableCell>
-                              <TableCell>{t.name}</TableCell>
-                              <TableCell>{t.accountName}</TableCell>
-                              <TableCell>{t.category}</TableCell>
-                              <TableCell align="right">
+                              <TableCell>
+                                <Box>
+                                  <Typography variant="body2">
+                                    {t.name}
+                                  </Typography>
+                                </Box>
+                              </TableCell>
+                              <TableCell>
+                                <Box>
+                                  <Typography variant="body2">
+                                    {t.accountName}
+                                  </Typography>
+                                </Box>
+                              </TableCell>
+                              <TableCell>
+                                <Box>
+                                  <Typography
+                                    variant="caption"
+                                    color="textSecondary"
+                                  >
+                                    {t.category}
+                                  </Typography>
+                                </Box>
+                              </TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  color:
+                                    t.amount < 0
+                                      ? "error.main"
+                                      : "success.main",
+                                }}
+                              >
                                 ${t.amount.toFixed(2)}
                               </TableCell>
                             </TableRow>
