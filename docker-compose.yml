@@ -34,7 +34,13 @@ services:
             
             SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
             SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
-    #    depends_on:
+        logging:
+            driver: awslogs
+            options:
+                awslogs-region: us-east-1
+                awslogs-group: /ecs/subintel-backend
+                awslogs-create-group: "true"
+    #   depends_on:
     #        - db
         networks:
             - app-network
