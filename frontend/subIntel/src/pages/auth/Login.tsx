@@ -41,7 +41,7 @@ export const Login = () => {
       if (response.ok) {
         const data = await response.json();
 
-        console.log("Token received from backend:", data.token);
+        //console.log("Token received from backend:", data.token);
 
         localStorage.setItem("jwtToken", data.token);
         navigate("/dashboard");

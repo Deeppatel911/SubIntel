@@ -40,7 +40,7 @@ const LinkAccount = () => {
   const { open, ready } = usePlaidLink({
     token: linkToken,
     onSuccess: (public_token, metadata) => {
-      console.log("Plaid link success!", public_token);
+      //console.log("Plaid link success!", public_token);
       console.log("Metadata:", metadata);
       const exchangeToken = async () => {
         try {

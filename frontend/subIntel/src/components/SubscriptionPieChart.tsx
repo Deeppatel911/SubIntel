@@ -30,7 +30,7 @@ const SubscriptionPieChart = () => {
           setChartData(null);
         } else {
           const data = await response.json();
-          console.log("Spending data received:", data);
+          //console.log("Spending data received:", data);
           setChartData(data);
         }
       } catch (error) {

@@ -202,7 +202,7 @@ export const Dashboard = () => {
 
     try {
       const jwtToken = localStorage.getItem("jwtToken");
-      const response = await fetch(`${apiUrl}api/plaid/item/${itemId}`, {
+      const response = await fetch(`${apiUrl}/api/plaid/item/${itemId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${jwtToken}` },
       });

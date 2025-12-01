@@ -48,8 +48,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(authz -> authz.requestMatchers("/api/auth/**").permitAll()
-						.requestMatchers("/api/**").hasRole("USER").anyRequest().authenticated())
+				.authorizeHttpRequests(
+						authz -> authz.requestMatchers("/api/auth/**").permitAll().requestMatchers("/actuator/**")
+								.permitAll().requestMatchers("/api/**").hasRole("USER").anyRequest().authenticated())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
 
